@@ -1,20 +1,19 @@
 package hi.mynameis.ilnano;
 
-import java.io.File;
 import java.util.Objects;
 
-public class NoopWriter implements ResultWriter<Output, File> {
+class NoopWriter implements ResultWriter<Output, String> {
 
-    private final File directory;
+    private final String location;
 
-    public NoopWriter(File directory) {
-        this.directory = directory;
+    public NoopWriter(String location) {
+        this.location = location;
     }
 
     @Override
-    public File write(Output data) {
+    public String write(Output data) {
         Objects.requireNonNull(data);
 
-        return directory;
+        return location;
     }
 }

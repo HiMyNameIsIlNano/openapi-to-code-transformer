@@ -2,27 +2,18 @@ package hi.mynameis.ilnano;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
-import java.net.URI;
-import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GenerateOpenApiMojoTest {
 
-    @TempDir
-    Path specFile;
-
-    @TempDir
-    Path outputDir;
-
     @Test
     void fails_when_both_spec_sources_provided() {
-        var testSubject = new GenerateOpenApiMojo(specFile.toFile(),
-                URI.create("https://x/spec.yaml"),
-                outputDir.toFile());
+        var testSubject = new GenerateOpenApiMojo("src/test/resources/openapi.yaml",
+                "https://x/spec.yaml",
+                "dummy"
+        );
 
         assertThatThrownBy(testSubject::execute)
                 .isInstanceOf(MojoExecutionException.class)
@@ -31,9 +22,10 @@ class GenerateOpenApiMojoTest {
 
     @Test
     void can_write_output_to_directory() {
-        var testSubject = new GenerateOpenApiMojo(specFile.toFile(),
+        var testSubject = new GenerateOpenApiMojo("src/test/resources/openapi.yaml",
                 null,
-                outputDir.toFile());
+                "dummy"
+        );
 
         assertThatNoException().isThrownBy(testSubject::execute);
     }

@@ -1,4 +1,4 @@
 package hi.mynameis.ilnano;
 
-public class NoopOutput implements Output {
+class NoopOutput implements Output {
 }
