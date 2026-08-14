@@ -8,6 +8,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @Mojo( name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES )
 public final class GenerateOpenApiMojo extends AbstractMojo {
@@ -21,22 +23,39 @@ public final class GenerateOpenApiMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", property = "outputFolder")
     private String outputFolder;
 
+    private final OpenAPIV3Parser parser;
+
     public GenerateOpenApiMojo() {
-        // Do not remove. For instantiation.
+        this(new OpenAPIV3Parser());
     }
 
-    GenerateOpenApiMojo(String specPath, String specUrl, String outputFolder) {
+    GenerateOpenApiMojo(OpenAPIV3Parser parser) {
+        this.parser = parser;
+    }
+
+    void setSpecPath(String specPath) {
         this.specPath = specPath;
+    }
+
+    void setSpecUrl(String specUrl) {
         this.specUrl = specUrl;
+    }
+
+    void setOutputFolder(String outputFolder) {
         this.outputFolder = outputFolder;
     }
 
     public void execute() throws MojoExecutionException {
-        if (!Objects.isNull(specPath) && !Objects.isNull(specUrl)) {
+        Predicate<String> isNotNull = path -> !Objects.isNull(path);
+        if (isNotNull.test(specPath) && isNotNull.test(specUrl)) {
             throw new MojoExecutionException("specPath and specUrl cannot be set at the same time");
         }
 
-        var openAPI = new OpenApiParser(new OpenAPIV3Parser()).parse(specPath);
+        var location = Optional.ofNullable(specPath)
+                .orElse(specUrl);
+
+         var openAPI = new OpenApiParser(parser)
+                .parse(location);
 
         var write = new NoopWriter(outputFolder).write(new NoopOutput());
 
