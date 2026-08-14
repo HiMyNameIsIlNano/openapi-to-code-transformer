@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info: { title: Same Tag, version: 1.0.0 }
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      tags: [ pets ]
+      responses: { '200': { description: ok } }
+    post:
+      operationId: createPet
+      tags: [ pets ]
+      responses: { '201': { description: created } }
+  /pets/{id}:
+    get:
+      operationId: getPet
+      tags: [ pets ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, format: int64 } }
+      responses: { '200': { description: ok } }

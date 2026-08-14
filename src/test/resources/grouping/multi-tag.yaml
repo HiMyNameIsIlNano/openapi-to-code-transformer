@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info: { title: Multi Tag, version: 1.0.0 }
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      tags: [ pets ]
+      responses: { '200': { description: ok } }
+  /owners:
+    get:
+      operationId: listOwners
+      tags: [ owners ]
+      responses: { '200': { description: ok } }
