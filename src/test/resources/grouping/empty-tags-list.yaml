@@ -1,0 +1,13 @@
+openapi: "3.0.3"
+info:
+  title: Empty tags list
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      tags: []
+      operationId: ping
+      summary: Ping endpoint
+      responses:
+        "200":
+          description: OK

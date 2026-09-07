@@ -1,0 +1,70 @@
+openapi: "3.0.3"
+info:
+  title: All HTTP verbs
+  version: "1.0"
+paths:
+  /resources:
+    get:
+      tags:
+        - resources
+      operationId: getResources
+      summary: GET
+      responses:
+        "200":
+          description: OK
+    post:
+      tags:
+        - resources
+      operationId: createResource
+      summary: POST
+      responses:
+        "201":
+          description: Created
+    put:
+      tags:
+        - resources
+      operationId: replaceResource
+      summary: PUT
+      responses:
+        "200":
+          description: OK
+    patch:
+      tags:
+        - resources
+      operationId: patchResource
+      summary: PATCH
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+        - resources
+      operationId: deleteResource
+      summary: DELETE
+      responses:
+        "204":
+          description: No Content
+    head:
+      tags:
+        - resources
+      operationId: headResource
+      summary: HEAD
+      responses:
+        "200":
+          description: OK
+    options:
+      tags:
+        - resources
+      operationId: optionsResource
+      summary: OPTIONS
+      responses:
+        "200":
+          description: OK
+    trace:
+      tags:
+        - resources
+      operationId: traceResource
+      summary: TRACE
+      responses:
+        "200":
+          description: OK

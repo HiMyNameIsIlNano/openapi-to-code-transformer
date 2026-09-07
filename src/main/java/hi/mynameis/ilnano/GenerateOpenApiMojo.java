@@ -14,11 +14,8 @@ import java.util.function.Predicate;
 @Mojo( name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES )
 public final class GenerateOpenApiMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project.build.sourceDirectory}/resources/openapi.yaml", property = "specPath")
-    private String specPath;
-
-    @Parameter(property = "specUrl")
-    private String specUrl;
+    @Parameter(defaultValue = "${project.build.sourceDirectory}/resources/openapi.yaml", property = "specDefinition")
+    private String specDefinition;
 
     @Parameter(defaultValue = "${project.build.directory}", property = "outputFolder")
     private String outputFolder;
@@ -33,12 +30,8 @@ public final class GenerateOpenApiMojo extends AbstractMojo {
         this.parser = parser;
     }
 
-    void setSpecPath(String specPath) {
-        this.specPath = specPath;
-    }
-
-    void setSpecUrl(String specUrl) {
-        this.specUrl = specUrl;
+    void setSpecDefinition(String specDefinition) {
+        this.specDefinition = specDefinition;
     }
 
     void setOutputFolder(String outputFolder) {
@@ -46,16 +39,12 @@ public final class GenerateOpenApiMojo extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException {
-        Predicate<String> isNotNull = path -> !Objects.isNull(path);
-        if (isNotNull.test(specPath) && isNotNull.test(specUrl)) {
+        if (Objects.isNull(specDefinition)) {
             throw new MojoExecutionException("specPath and specUrl cannot be set at the same time");
         }
 
-        var location = Optional.ofNullable(specPath)
-                .orElse(specUrl);
-
          var openAPI = new OpenApiParser(parser)
-                .parse(location);
+                .parse(specDefinition);
 
         var write = new NoopWriter(outputFolder).write(new NoopOutput());
 

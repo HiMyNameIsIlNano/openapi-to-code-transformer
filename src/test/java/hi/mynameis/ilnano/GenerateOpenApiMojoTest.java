@@ -14,8 +14,8 @@ class GenerateOpenApiMojoTest {
         // Arrange
         var testSubject = new GenerateOpenApiMojo(new OpenAPIV3Parser());
 
-        testSubject.setSpecPath("src/test/resources/openapi.yaml");
-        testSubject.setSpecUrl("https://x/spec.yaml");
+        testSubject.setSpecDefinition("src/test/resources/openapi.yaml");
+        testSubject.setSpecDefinition("https://x/spec.yaml");
         testSubject.setOutputFolder("dummy");
 
         // Act & Assert
@@ -29,7 +29,7 @@ class GenerateOpenApiMojoTest {
         // Arrange
         var testSubject = new GenerateOpenApiMojo(new OpenAPIV3Parser());
 
-        testSubject.setSpecPath("src/test/resources/openapi.yaml");
+        testSubject.setSpecDefinition("src/test/resources/openapi.yaml");
         testSubject.setOutputFolder("dummy");
 
         // Act & Assert

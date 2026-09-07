@@ -1,0 +1,14 @@
+openapi: "3.0.3"
+info:
+  title: Lowercase tags
+  version: "1.0"
+paths:
+  /inventory:
+    get:
+      tags:
+        - inventory
+      operationId: getStock
+      summary: Get inventory stock
+      responses:
+        "200":
+          description: OK
