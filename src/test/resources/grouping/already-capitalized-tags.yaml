@@ -1,0 +1,14 @@
+openapi: "3.0.3"
+info:
+  title: Already capitalized tags
+  version: "1.0"
+paths:
+  /billing/invoices:
+    get:
+      tags:
+        - Billing
+      operationId: getInvoices
+      summary: Get invoices
+      responses:
+        "200":
+          description: OK

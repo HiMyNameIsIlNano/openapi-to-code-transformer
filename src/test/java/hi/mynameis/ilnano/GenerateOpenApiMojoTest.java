@@ -9,31 +9,37 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GenerateOpenApiMojoTest {
 
+    private GenerateOpenApiMojo mojo() {
+        var mojo = new GenerateOpenApiMojo(new OpenAPIV3Parser());
+        mojo.setOutputFolder("dummy");
+        mojo.setBasePackage("com.acme.generated");
+
+        return mojo;
+    }
+
     @Test
-    void fails_when_both_spec_sources_provided() {
-        // Arrange
-        var testSubject = new GenerateOpenApiMojo(new OpenAPIV3Parser());
+    void fails_when_no_spec_is_provided() {
+        var testSubject = mojo();
 
-        testSubject.setSpecPath("src/test/resources/openapi.yaml");
-        testSubject.setSpecUrl("https://x/spec.yaml");
-        testSubject.setOutputFolder("dummy");
-
-        // Act & Assert
         assertThatThrownBy(testSubject::execute)
                 .isInstanceOf(MojoExecutionException.class)
-                .hasMessageContaining("specPath and specUrl cannot be set at the same time");
+                .hasMessageContaining("specDefinition must be set");
+    }
+
+    @Test
+    void fails_when_the_spec_cannot_be_read() {
+        var testSubject = mojo();
+        testSubject.setSpecDefinition("https://x/spec.yaml");
+
+        assertThatThrownBy(testSubject::execute)
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     void can_write_output_to_directory() {
-        // Arrange
-        var testSubject = new GenerateOpenApiMojo(new OpenAPIV3Parser());
+        var testSubject = mojo();
+        testSubject.setSpecDefinition("src/test/resources/openapi.yaml");
 
-        testSubject.setSpecPath("src/test/resources/openapi.yaml");
-        testSubject.setOutputFolder("dummy");
-
-        // Act & Assert
         assertThatNoException().isThrownBy(testSubject::execute);
     }
-
 }

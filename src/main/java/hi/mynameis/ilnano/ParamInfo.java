@@ -1,3 +1,6 @@
 package hi.mynameis.ilnano;
 
-record ParamInfo(String type, String name, String in) {}
+import io.swagger.v3.oas.models.media.Schema;
+
+record ParamInfo(String name, ParameterLocation in, Schema<?> schema, boolean required) {
+}

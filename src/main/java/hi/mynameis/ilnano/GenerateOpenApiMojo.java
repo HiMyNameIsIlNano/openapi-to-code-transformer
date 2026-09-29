@@ -8,20 +8,18 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
 
-@Mojo( name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES )
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public final class GenerateOpenApiMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project.build.sourceDirectory}/resources/openapi.yaml", property = "specPath")
-    private String specPath;
-
-    @Parameter(property = "specUrl")
-    private String specUrl;
+    @Parameter(defaultValue = "${project.build.sourceDirectory}/resources/openapi.yaml", property = "specDefinition")
+    private String specDefinition;
 
     @Parameter(defaultValue = "${project.build.directory}", property = "outputFolder")
     private String outputFolder;
+
+    @Parameter(defaultValue = "hi.mynameis.ilnano.generated", property = "basePackage")
+    private String basePackage = "hi.mynameis.ilnano.generated";
 
     private final OpenAPIV3Parser parser;
 
@@ -33,33 +31,28 @@ public final class GenerateOpenApiMojo extends AbstractMojo {
         this.parser = parser;
     }
 
-    void setSpecPath(String specPath) {
-        this.specPath = specPath;
-    }
-
-    void setSpecUrl(String specUrl) {
-        this.specUrl = specUrl;
+    void setSpecDefinition(String specDefinition) {
+        this.specDefinition = specDefinition;
     }
 
     void setOutputFolder(String outputFolder) {
         this.outputFolder = outputFolder;
     }
 
-    public void execute() throws MojoExecutionException {
-        Predicate<String> isNotNull = path -> !Objects.isNull(path);
-        if (isNotNull.test(specPath) && isNotNull.test(specUrl)) {
-            throw new MojoExecutionException("specPath and specUrl cannot be set at the same time");
-        }
-
-        var location = Optional.ofNullable(specPath)
-                .orElse(specUrl);
-
-         var openAPI = new OpenApiParser(parser)
-                .parse(location);
-
-        var write = new NoopWriter(outputFolder).write(new NoopOutput());
-
-        Objects.requireNonNull(write);
+    void setBasePackage(String basePackage) {
+        this.basePackage = basePackage;
     }
 
+    @Override
+    public void execute() throws MojoExecutionException {
+        if (Objects.isNull(specDefinition)) {
+            throw new MojoExecutionException("specDefinition must be set");
+        }
+
+        var spec = new OpenApiParser(parser).parse(specDefinition);
+        var generated = new JavaGenerator().generate(spec, basePackage);
+
+        getLog().info("Generated %d API interfaces and %d models into %s"
+                .formatted(generated.apis().size(), generated.models().size(), outputFolder));
+    }
 }

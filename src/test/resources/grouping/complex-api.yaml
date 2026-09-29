@@ -1,0 +1,180 @@
+openapi: "3.0.3"
+info:
+  title: Complex E-Commerce API
+  version: "2.1.0"
+  description: A fairly complex API with multiple resources, tags, and HTTP methods
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      operationId: listUsers
+      summary: List all users
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A list of users
+    post:
+      tags:
+        - users
+      operationId: createUser
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        "201":
+          description: User created
+  /users/{id}:
+    get:
+      tags:
+        - users
+      operationId: getUser
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single user
+        "404":
+          description: User not found
+    put:
+      tags:
+        - users
+      operationId: updateUser
+      summary: Update a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        "200":
+          description: User updated
+    delete:
+      tags:
+        - users
+      operationId: deleteUser
+      summary: Delete a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted
+  /orders:
+    get:
+      tags:
+        - orders
+      operationId: listOrders
+      summary: List all orders
+      responses:
+        "200":
+          description: A list of orders
+    post:
+      tags:
+        - orders
+      operationId: createOrder
+      summary: Place a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                items:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: Order placed
+  /orders/{id}:
+    get:
+      tags:
+        - orders
+      operationId: getOrder
+      summary: Get order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single order
+  /products:
+    get:
+      tags:
+        - products
+      operationId: listProducts
+      summary: List all products
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of products
+  /products/{id}:
+    get:
+      tags:
+        - products
+      operationId: getProduct
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single product
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check endpoint (no tags)
+      responses:
+        "200":
+          description: Service is healthy

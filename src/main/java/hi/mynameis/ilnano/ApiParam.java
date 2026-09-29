@@ -6,13 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.METHOD)
-public @interface ApiAnnotation {
+@Target(ElementType.PARAMETER)
+public @interface ApiParam {
 
-    OperationTypeEnum type();
+    String name();
 
-    String path();
+    ParameterLocation in();
 
-    String[] produces() default {"application/json"};
+    boolean required() default false;
 
 }

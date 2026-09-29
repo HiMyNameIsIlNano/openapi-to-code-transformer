@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info: { title: Already Flat, version: 1.0.0 }
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        name:    { type: string }
+        address: { $ref: '#/components/schemas/Address' }
+    Address:
+      type: object
+      properties:
+        street: { type: string }

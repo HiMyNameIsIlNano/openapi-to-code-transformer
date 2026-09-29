@@ -3,9 +3,9 @@ package hi.mynameis.ilnano;
 import java.util.List;
 
 record OperationInfo(
-        String httpMethod,
+        OperationTypeEnum httpMethod,
         String path,
         String operationId,
-        String returnType,
-        List<ParamInfo> params) {}
-
+        ResolvedResponse response,
+        List<ParamInfo> params) {
+}
