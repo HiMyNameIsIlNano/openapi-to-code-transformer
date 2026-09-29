@@ -20,12 +20,8 @@ final class OpenApiParser implements Parser<OpenAPI> {
     public OpenAPI parse(String location) {
         Objects.requireNonNull(location);
 
-        var options = new ParseOptions();
-        options.setResolve(true);
-        options.setResolveFully(true);
-
         try {
-            var result = openAPIV3Parser.readLocation(location, null, options);
+            var result = openAPIV3Parser.readLocation(location, null, flatteningOptions());
 
             return Optional.ofNullable(result)
                     .map(SwaggerParseResult::getOpenAPI)
@@ -33,5 +29,14 @@ final class OpenApiParser implements Parser<OpenAPI> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private ParseOptions flatteningOptions() {
+        var options = new ParseOptions();
+        options.setResolve(true);
+        options.setFlatten(true);
+        options.setCamelCaseFlattenNaming(true);
+
+        return options;
     }
 }

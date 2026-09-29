@@ -1,36 +1,25 @@
 package hi.mynameis.ilnano;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 final class TagMapper implements Mapper {
 
-    private final UnaryOperator<String> mapper;
+    private static final ApiTag DEFAULT_TAG = new ApiTag("Default");
 
-    TagMapper(UnaryOperator<String> mapper) {
-        this.mapper = mapper;
+    private final UnaryOperator<String> nameStyle;
+
+    TagMapper(UnaryOperator<String> nameStyle) {
+        this.nameStyle = nameStyle;
     }
 
-
-    /**
-     * It maps a (group of) tag(s) to a single tag. If the provided input has a size bigger than 1, then only the first tag is taken
-     * and the rest is discarded.
-     *
-     *
-     **/
     @Override
     public ApiTag mapTags(List<String> tags) {
-        if (Objects.isNull(tags)) {
-            return new ApiTag("Default");
-        }
-
-        if (tags.isEmpty()) {
-            return new ApiTag("Default");
-        }
-
-        var tag = tags.get(0);
-        return new ApiTag(mapper.apply(tag));
+        return Optional.ofNullable(tags)
+                .flatMap(candidates -> candidates.stream().findFirst())
+                .map(nameStyle)
+                .map(ApiTag::new)
+                .orElse(DEFAULT_TAG);
     }
-
 }

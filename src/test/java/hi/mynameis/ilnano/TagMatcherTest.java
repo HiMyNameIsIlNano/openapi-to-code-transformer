@@ -38,7 +38,7 @@ final class TagMatcherTest implements OpenApiLoader {
         assertThat(byTag.get(new ApiTag("Pets")))
                 .filteredOn(operationInfo -> "/pets".equals(operationInfo.path()))
                 .extracting(OperationInfo::httpMethod)
-                .containsExactlyInAnyOrder("GET", "POST");
+                .containsExactlyInAnyOrder(OperationTypeEnum.GET, OperationTypeEnum.POST);
     }
 
     @Test
@@ -149,7 +149,7 @@ final class TagMatcherTest implements OpenApiLoader {
                 .filteredOn(operationInfo -> "getUser".equals(operationInfo.operationId()))
                 .singleElement()
                 .satisfies(operationInfo -> {
-                    assertThat(operationInfo.httpMethod()).isEqualTo("GET");
+                    assertThat(operationInfo.httpMethod()).isEqualTo(OperationTypeEnum.GET);
                     assertThat(operationInfo.path()).isEqualTo("/users/{id}");
                 });
 
@@ -157,7 +157,7 @@ final class TagMatcherTest implements OpenApiLoader {
                 .filteredOn(operationInfo -> "createOrder".equals(operationInfo.operationId()))
                 .singleElement()
                 .satisfies(operationInfo -> {
-                    assertThat(operationInfo.httpMethod()).isEqualTo("POST");
+                    assertThat(operationInfo.httpMethod()).isEqualTo(OperationTypeEnum.POST);
                     assertThat(operationInfo.path()).isEqualTo("/orders");
                 });
     }
@@ -169,7 +169,7 @@ final class TagMatcherTest implements OpenApiLoader {
         assertThat(byTag).containsOnlyKeys(new ApiTag("Resources"));
         assertThat(byTag.get(new ApiTag("Resources")))
                 .extracting(OperationInfo::httpMethod)
-                .containsExactlyInAnyOrder("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "TRACE");
+                .containsExactlyInAnyOrder(OperationTypeEnum.values());
     }
 
     @Test

@@ -1,0 +1,111 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Annotated API", "version": "1.0.0" },
+  "paths": {
+    "/pets": {
+      "get": {
+        "tags": ["pets"],
+        "operationId": "listPets",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "format": "int32" } },
+          { "name": "X-Trace-Id", "in": "header", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "the pets",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Pet" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["pets"],
+        "operationId": "createPet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } }
+            }
+          }
+        }
+      }
+    },
+    "/pets/{petId}": {
+      "get": {
+        "tags": ["pets"],
+        "operationId": "getPet",
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "one pet",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["pets"],
+        "operationId": "deletePet",
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "204": { "description": "gone" }
+        }
+      }
+    },
+    "/owners": {
+      "get": {
+        "tags": ["owners"],
+        "operationId": "listOwners",
+        "responses": {
+          "200": {
+            "description": "the owners",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Owner" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Pet": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "age": { "type": "integer", "format": "int32" },
+          "weight": { "type": "number", "format": "double" },
+          "vaccinated": { "type": "boolean" },
+          "bornOn": { "type": "string", "format": "date" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "Owner": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "fullName": { "type": "string" },
+          "pets": { "type": "array", "items": { "$ref": "#/components/schemas/Pet" } }
+        }
+      }
+    }
+  }
+}

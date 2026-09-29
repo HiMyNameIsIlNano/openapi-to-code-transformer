@@ -1,5 +1,6 @@
 package hi.mynameis.ilnano;
 
+import io.micronaut.sourcegen.javapoet.AnnotationSpec;
 import io.micronaut.sourcegen.javapoet.JavaFile;
 import io.micronaut.sourcegen.javapoet.TypeSpec;
 
@@ -8,29 +9,31 @@ import java.util.List;
 
 final class InterfacePojoGenerator implements Renderer {
 
-    private final String apiPkg;
+    private static final String API_SUFFIX = "Api";
+
+    private final String apiPackage;
 
     private final OperationRenderer operationRenderer;
 
-    InterfacePojoGenerator(String apiPkg, OperationRenderer operationRenderer) {
-        this.apiPkg = apiPkg;
+    InterfacePojoGenerator(String apiPackage, OperationRenderer operationRenderer) {
+        this.apiPackage = apiPackage;
         this.operationRenderer = operationRenderer;
     }
 
     @Override
-    public String render(ApiTag tag, List<OperationInfo> operationInfoList) {
-        TypeSpec.Builder api = TypeSpec.interfaceBuilder(tag + "Api")
-                .addModifiers(Modifier.PUBLIC);
-
-        for (OperationInfo operationInfo : operationInfoList) {
-            api.addMethod(operationRenderer.render(operationInfo));
-        }
-
-        JavaFile javaFile = JavaFile.builder(apiPkg, api.build())
-                .skipJavaLangImports(true)
-                .indent("    ")
+    public String render(ApiTag tag, List<OperationInfo> operations) {
+        var api = TypeSpec.interfaceBuilder(tag.value() + API_SUFFIX)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(AnnotationSpec.builder(ApiInterface.class)
+                        .addMember("tag", "$S", tag.value())
+                        .build())
+                .addMethods(operations.stream().map(operationRenderer::render).toList())
                 .build();
 
-        return javaFile.toString();
+        return JavaFile.builder(apiPackage, api)
+                .skipJavaLangImports(true)
+                .indent("    ")
+                .build()
+                .toString();
     }
 }

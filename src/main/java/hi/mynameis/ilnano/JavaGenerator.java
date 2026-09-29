@@ -1,14 +1,20 @@
 package hi.mynameis.ilnano;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import org.openrewrite.InMemoryExecutionContext;
-import org.openrewrite.java.JavaParser;
+import io.swagger.v3.oas.models.media.Schema;
+
+import java.util.Map;
+import java.util.Optional;
 
 final class JavaGenerator implements Generator {
 
+    private static final String API_PACKAGE = "api";
+    private static final String MODEL_PACKAGE = "model";
+
     private final TagMatcher tagMatcher;
 
-    public JavaGenerator() {
+    JavaGenerator() {
         this(new TagMatcher());
     }
 
@@ -17,30 +23,28 @@ final class JavaGenerator implements Generator {
     }
 
     @Override
-    public GenerationResult generate(OpenAPI spec, String basePackage) {
-        var byTag = tagMatcher.groupByTag(spec);
+    public GeneratedSources generate(OpenAPI spec, String basePackage) {
+        var modelPackage = basePackage + "." + MODEL_PACKAGE;
+        var typeMapper = new TypeMapper(modelPackage);
+        var namer = new ParameterNamer();
 
-        var operationRenderer = new OperationRenderer(basePackage + ".model");
-        var interfacePojoGenerator = new InterfacePojoGenerator(basePackage + ".api", operationRenderer);
-        var apiSources = byTag.entrySet().stream()
-                .map(apiTagListEntry -> interfacePojoGenerator.render(apiTagListEntry.getKey(), apiTagListEntry.getValue()))
+        var interfaceGenerator = new InterfacePojoGenerator(
+                basePackage + "." + API_PACKAGE, new OperationRenderer(typeMapper, namer));
+        var apis = tagMatcher.groupByTag(spec).entrySet().stream()
+                .map(byTag -> interfaceGenerator.render(byTag.getKey(), byTag.getValue()))
                 .toList();
 
-        var modelGenerator = new RecordGenerator();
-        var modelSources = byTag.entrySet().stream()
-                .map(apiTagListEntry -> modelGenerator.render(apiTagListEntry.getKey(), apiTagListEntry.getValue()))
+        var recordGenerator = new RecordGenerator(modelPackage, typeMapper, namer);
+        var models = componentSchemas(spec).entrySet().stream()
+                .map(schema -> recordGenerator.render(schema.getKey(), schema.getValue()))
                 .toList();
 
-        var parser = JavaParser.fromJavaVersion()
-                .build();
-        var context = new InMemoryExecutionContext();
-
-        var apis = parser.parse(context, apiSources.toArray(new String[0]))
-                .toList();
-        var models = parser.parse(context, modelSources.toArray(new String[0]))
-                .toList();
-
-        return new GenerationResult(models, apis);
+        return new GeneratedSources(models, apis);
     }
 
+    private Map<String, Schema> componentSchemas(OpenAPI spec) {
+        return Optional.ofNullable(spec.getComponents())
+                .map(Components::getSchemas)
+                .orElseGet(Map::of);
+    }
 }

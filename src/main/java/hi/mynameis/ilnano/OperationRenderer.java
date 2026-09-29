@@ -1,45 +1,73 @@
 package hi.mynameis.ilnano;
 
 import io.micronaut.sourcegen.javapoet.AnnotationSpec;
+import io.micronaut.sourcegen.javapoet.CodeBlock;
 import io.micronaut.sourcegen.javapoet.MethodSpec;
 import io.micronaut.sourcegen.javapoet.ParameterSpec;
+import io.micronaut.sourcegen.javapoet.TypeName;
 
 import javax.lang.model.element.Modifier;
-import java.lang.reflect.Type;
+import java.util.List;
 
 final class OperationRenderer {
 
-    private final String modelPackage;
+    private final TypeMapper typeMapper;
 
-    OperationRenderer(String modelPackage) {
-        this.modelPackage = modelPackage;
+    private final ParameterNamer parameterNamer;
+
+    OperationRenderer(TypeMapper typeMapper) {
+        this(typeMapper, new ParameterNamer());
     }
 
-    public MethodSpec render(OperationInfo operationInfo) {
-        AnnotationSpec marker = AnnotationSpec.builder(ApiOperationMarker.class)
-                .addMember("type", "$T.$L", Type.class, operationInfo.httpMethod())
-                .addMember("path", "$S", operationInfo.path())
+    OperationRenderer(TypeMapper typeMapper, ParameterNamer parameterNamer) {
+        this.typeMapper = typeMapper;
+        this.parameterNamer = parameterNamer;
+    }
+
+    MethodSpec render(OperationInfo operation) {
+        return MethodSpec.methodBuilder(operation.operationId())
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addAnnotation(operationAnnotation(operation))
+                .returns(returnType(operation))
+                .addParameters(operation.params().stream().map(this::renderParameter).toList())
                 .build();
+    }
 
-        MethodSpec.Builder method = MethodSpec.methodBuilder(operationInfo.operationId())
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT) // interface method
-                .addAnnotation(marker)
-                //.returns(TypeMapper.toTypeName(operationInfo.returnType(), modelPkg));
-                .returns(TypeMapper.toTypeName(null, modelPackage));
+    private AnnotationSpec operationAnnotation(OperationInfo operation) {
+        var annotation = AnnotationSpec.builder(ApiAnnotation.class)
+                .addMember("type", "$T.$L", OperationTypeEnum.class, operation.httpMethod())
+                .addMember("path", "$S", operation.path());
 
-        for (ParamInfo paramInfo : operationInfo.params()) {
-            method.addParameter(
-                    ParameterSpec.builder(
-                                    TypeMapper.toTypeName(null, modelPackage),
-                                    safeName(paramInfo.name()))
-                            .build());
+        var mediaTypes = operation.response().mediaTypes();
+        if (!mediaTypes.isEmpty()) {
+            annotation.addMember("produces", producedMediaTypes(mediaTypes));
         }
-
-        return method.build();
+        return annotation.build();
     }
 
-    private String safeName(String name) {
-        return name;
+    private CodeBlock producedMediaTypes(List<String> mediaTypes) {
+        return mediaTypes.size() == 1
+                ? CodeBlock.of("$S", mediaTypes.get(0))
+                : mediaTypes.stream()
+                        .map(mediaType -> CodeBlock.of("$S", mediaType))
+                        .collect(CodeBlock.joining(", ", "{", "}"));
     }
 
+    private TypeName returnType(OperationInfo operation) {
+        return operation.response().schema() == null
+                ? TypeName.VOID
+                : typeMapper.toTypeName(operation.response().schema());
+    }
+
+    private ParameterSpec renderParameter(ParamInfo param) {
+        return ParameterSpec.builder(
+                        typeMapper.toTypeName(param.schema()),
+                        parameterNamer.toJavaName(param.name()))
+                .addAnnotation(AnnotationSpec.builder(ApiParam.class)
+                        .addMember("name", "$S", param.name())
+                        .addMember("in", "$T.$L", ParameterLocation.class, param.in())
+                        .addMember("required", "$L", param.required())
+                        .build())
+                .build();
+    }
 }
