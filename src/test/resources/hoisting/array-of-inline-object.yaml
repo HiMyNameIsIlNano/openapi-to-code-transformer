@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info: { title: Array Inline, version: 1.0.0 }
+components:
+  schemas:
+    Owner:
+      type: object
+      properties:
+        pets:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-class TagMapper implements Mapper {
+final class TagMapper implements Mapper {
 
     private final UnaryOperator<String> mapper;
 
