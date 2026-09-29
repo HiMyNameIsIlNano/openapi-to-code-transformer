@@ -1,0 +1,36 @@
+openapi: "3.0.3"
+info:
+  title: Custom Configuration API
+  version: "1.0.0"
+paths:
+  /stores:
+    get:
+      tags: [stores]
+      operationId: listStores
+      responses:
+        "200":
+          description: the stores
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Store" }
+  /stores/{storeId}:
+    delete:
+      tags: [stores]
+      operationId: deleteStore
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: gone
+components:
+  schemas:
+    Store:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
