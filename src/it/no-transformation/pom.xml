@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <groupId>hi.mynameis.ilnano.it</groupId>
-    <artifactId>custom-configuration</artifactId>
+    <artifactId>no-transformation</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>IT: plugin rebound to another phase with a custom output folder</name>
+    <name>IT: the build fails when no transformation is configured</name>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
@@ -14,7 +14,10 @@
 
     <build>
         <plugins>
-            <!-- The user overrides the phase, the spec location and the output folder. -->
+            <!--
+                No <transformations> at all. The marker-annotated sources are not useful on their
+                own, so the plugin must refuse rather than write something nothing can compile.
+            -->
             <plugin>
                 <groupId>@project.groupId@</groupId>
                 <artifactId>@project.artifactId@</artifactId>
@@ -22,20 +25,11 @@
                 <executions>
                     <execution>
                         <id>generate</id>
-                        <phase>process-sources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <specDefinition>${project.basedir}/spec/pet-store.yaml</specDefinition>
-                            <outputFolder>${project.build.directory}/my-api</outputFolder>
-                            <basePackage>com.acme.custom</basePackage>
-                            <transformations>
-                                <transformation>
-                                    <flavour>SPRING</flavour>
-                                    <group>pet-store</group>
-                                </transformation>
-                            </transformations>
+                            <basePackage>com.acme.generated</basePackage>
                         </configuration>
                     </execution>
                 </executions>

@@ -23,6 +23,9 @@
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <maven-invoker-plugin.version>3.10.1</maven-invoker-plugin.version>
         <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+        <jakarta-ws-rs.version>4.0.0</jakarta-ws-rs.version>
+        <microprofile-rest-client.version>4.0</microprofile-rest-client.version>
+        <spring.version>7.0.0</spring.version>
     </properties>
 
     <dependencyManagement>
@@ -94,6 +97,10 @@
             <artifactId>rewrite-java</artifactId>
             <version>${rewrite.version}</version>
         </dependency>
+        <!--
+            The mojo parses and rewrites the generated sources itself, so a language-level parser
+            has to be on the plugin's own runtime classpath, not merely available to tests.
+        -->
         <dependency>
             <groupId>org.openrewrite</groupId>
             <artifactId>rewrite-java-17</artifactId>
@@ -112,6 +119,12 @@
             <version>${rewrite.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-test</artifactId>
+            <version>${rewrite.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -126,6 +139,35 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+            The target frameworks' annotations, so that the tests can compile the transformed output
+            and prove it is valid against the real APIs rather than only matching on text.
+        -->
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jakarta-ws-rs.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.rest.client</groupId>
+            <artifactId>microprofile-rest-client-api</artifactId>
+            <version>${microprofile-rest-client.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

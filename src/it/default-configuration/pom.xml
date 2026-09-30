@@ -27,6 +27,11 @@
                         </goals>
                         <configuration>
                             <basePackage>com.acme.generated</basePackage>
+                            <transformations>
+                                <transformation>
+                                    <flavour>QUARKUS</flavour>
+                                </transformation>
+                            </transformations>
                         </configuration>
                     </execution>
                 </executions>

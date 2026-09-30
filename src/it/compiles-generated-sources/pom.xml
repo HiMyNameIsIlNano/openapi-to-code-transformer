@@ -13,12 +13,20 @@
     </properties>
 
     <dependencies>
-        <!-- The generated sources reference the plugin's annotations. -->
+        <!--
+            The transformed sources reference the target framework's annotations, and nothing from
+            this plugin: the markers are replaced during generation, so the plugin is not needed on
+            the compile path at all.
+        -->
         <dependency>
-            <groupId>@project.groupId@</groupId>
-            <artifactId>@project.artifactId@</artifactId>
-            <version>@project.version@</version>
-            <scope>provided</scope>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.rest.client</groupId>
+            <artifactId>microprofile-rest-client-api</artifactId>
+            <version>4.0</version>
         </dependency>
     </dependencies>
 
@@ -36,6 +44,11 @@
                         </goals>
                         <configuration>
                             <basePackage>com.acme.generated</basePackage>
+                            <transformations>
+                                <transformation>
+                                    <flavour>QUARKUS</flavour>
+                                </transformation>
+                            </transformations>
                         </configuration>
                     </execution>
                 </executions>

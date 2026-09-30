@@ -11,12 +11,15 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.regex.Pattern;
 
-final class JavaSourceCompiler {
+public final class JavaSourceCompiler {
 
+    /**
+     * {@code @interface} is matched too, since a transformation may generate an annotation type.
+     */
     private static final Pattern TYPE_DECLARATION =
-            Pattern.compile("public\\s+(?:interface|record|class|enum)\\s+(\\w+)");
+            Pattern.compile("public\\s+(?:@?interface|record|class|enum)\\s+(\\w+)");
 
-    List<String> compile(List<String> sources) {
+    public List<String> compile(List<String> sources) {
         var compiler = ToolProvider.getSystemJavaCompiler();
         var diagnostics = new DiagnosticCollector<JavaFileObject>();
 
